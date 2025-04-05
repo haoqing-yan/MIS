@@ -1,0 +1,38 @@
+spring:
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+      routes:
+        - id: mis-auth
+          uri: lb://mis-auth
+          predicates:
+            - Path=/auth/**
+          filters:
+            - StripPrefix=1
+        - id: mis-system
+          uri: lb://mis-system
+          predicates:
+            - Path=/system/**
+          filters:
+            - StripPrefix=1
+        - id: mis-monitor
+          uri: lb://mis-monitor
+          predicates:
+            - Path=/monitor/**
+          filters:
+            - StripPrefix=1
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOriginPatterns: "http://uat.mis.com"
+            allowedMethods: "GET,POST,PUT,DELETE,OPTIONS"
+            allowedHeaders: "*"
+            allowCredentials: true
+            maxAge: 3600
+
+logging:
+  level:
+    org.springframework.cloud.gateway: info
+    org.springframework.security: warn 

@@ -1,0 +1,52 @@
+server:
+  port: 9000
+
+spring:
+  main:
+    web-application-type: reactive
+    allow-bean-definition-overriding: true
+  application:
+    name: mis-gateway
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+      routes:
+        - id: auth-service
+          uri: lb://mis-auth
+          predicates:
+            - Path=/auth/**
+          filters:
+            - StripPrefix=1
+        - id: system-service
+          uri: lb://mis-system
+          predicates:
+            - Path=/system/**
+          filters:
+            - StripPrefix=1
+        - id: monitor-service
+          uri: lb://mis-monitor
+          predicates:
+            - Path=/monitor/**
+          filters:
+            - StripPrefix=1
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOriginPatterns: "*"
+            allowedMethods: "*"
+            allowedHeaders: "*"
+            allowCredentials: true
+            maxAge: 3600
+
+logging:
+  level:
+    root: INFO
+    com.mis: DEBUG
+    org.springframework.cloud.gateway: DEBUG
+    org.springframework.security: DEBUG 
